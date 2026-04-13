@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  baza-treningowa:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: superhaslo123
+      POSTGRES_DB: dziennik
+    ports:
+      - "5432:5432"
+
+  aplikacja-dziennik:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - baza-treningowa

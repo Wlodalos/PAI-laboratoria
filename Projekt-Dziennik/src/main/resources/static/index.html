@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Mój Dziennik Treningowy</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; padding-top: 50px; }
+        .container { max-width: 800px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin: auto; }
+        .auth-container { max-width: 400px; }
+        h2 { color: #333; margin-bottom: 25px; text-align: center; }
+        #app-section, #register-section { display: none; }
+        .alert { display: none; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="container auth-container" id="login-section">
+        <h2>🔒 Zaloguj się</h2>
+        <div class="alert alert-danger" id="login-error">Błąd logowania!</div>
+        <form id="login-form">
+            <input type="text" id="log-user" class="form-control mb-3" placeholder="Nazwa użytkownika" required>
+            <input type="password" id="log-pass" class="form-control mb-3" placeholder="Hasło" required>
+            <button type="submit" class="btn btn-primary w-100">Zaloguj</button>
+        </form>
+        <p class="text-center mt-3">Nie masz konta? <a href="#" onclick="pokazRejestracje()">Zarejestruj się</a></p>
+    </div>
+
+    <div class="container auth-container" id="register-section">
+        <h2>📝 Rejestracja</h2>
+        <div class="alert alert-success" id="reg-success">Konto utworzone! Możesz się zalogować.</div>
+        <div class="alert alert-danger" id="reg-error">Użytkownik już istnieje!</div>
+        <form id="register-form">
+            <input type="text" id="reg-user" class="form-control mb-3" placeholder="Nowa nazwa użytkownika" required>
+            <input type="password" id="reg-pass" class="form-control mb-3" placeholder="Nowe hasło" required>
+            <button type="submit" class="btn btn-success w-100">Utwórz konto</button>
+        </form>
+        <p class="text-center mt-3">Masz już konto? <a href="#" onclick="pokazLogowanie()">Zaloguj się</a></p>
+    </div>
+
+    <div class="container" id="app-section">
+        <h2>🏋️ Dziennik Treningowy: <span id="user-display"></span></h2>
+        <button class="btn btn-outline-danger mb-3" onclick="wyloguj()" style="float: right;">Wyloguj</button>
+        
+        <form id="add-workout-form" class="row g-3 mb-4">
+            <div class="col-md-5"><input type="text" id="cwiczenie" class="form-control" placeholder="Nazwa ćwiczenia" required></div>
+            <div class="col-md-3"><input type="number" id="serie" class="form-control" placeholder="Serie" required></div>
+            <div class="col-md-2"><input type="number" id="powtorzenia" class="form-control" placeholder="Powt." required></div>
+            <div class="col-md-2"><button type="submit" class="btn btn-dark w-100">Dodaj</button></div>
+        </form>
+
+        <table class="table table-striped mt-4">
+            <thead class="table-dark">
+                <tr><th>Ćwiczenie</th><th>Serie</th><th>Powtórzenia</th><th>Akcja</th></tr>
+            </thead>
+            <tbody id="treningi-list"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let currentToken = '';
+
+        function pokazRejestracje() { document.getElementById('login-section').style.display='none'; document.getElementById('register-section').style.display='block'; }
+        function pokazLogowanie() { document.getElementById('register-section').style.display='none'; document.getElementById('login-section').style.display='block'; }
+        function wyloguj() { location.reload(); }
+
+        // REJESTRACJA
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('reg-user').value;
+            const pass = document.getElementById('reg-pass').value;
+
+            fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            })
+            .then(res => {
+                if(res.ok) { document.getElementById('reg-success').style.display='block'; document.getElementById('reg-error').style.display='none'; }
+                else { document.getElementById('reg-error').style.display='block'; document.getElementById('reg-success').style.display='none'; }
+            });
+        });
+
+        // LOGOWANIE
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('log-user').value;
+            const pass = document.getElementById('log-pass').value;
+            currentToken = 'Basic ' + btoa(user + ':' + pass);
+
+            fetch('/treningi', { headers: { 'Authorization': currentToken } })
+            .then(res => {
+                if (res.ok) {
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('app-section').style.display = 'block';
+                    document.getElementById('user-display').innerText = user;
+                    return res.json();
+                } else throw new Error();
+            })
+            .then(data => wyswietlTreningi(data))
+            .catch(() => document.getElementById('login-error').style.display = 'block');
+        });
+
+        // DODAWANIE TRENINGU
+        document.getElementById('add-workout-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const cwiczenie = document.getElementById('cwiczenie').value;
+            const serie = document.getElementById('serie').value;
+            const powtorzenia = document.getElementById('powtorzenia').value;
+
+            fetch('/treningi', {
+                method: 'POST',
+                headers: { 'Authorization': currentToken, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                exerciseName: cwiczenie, 
+                weight: parseInt(serie) || 0, 
+                repetitions: parseInt(powtorzenia) || 0 
+            })
+            })
+            .then(() => {
+                // Po dodaniu odświeżamy tabelkę pobierając dane jeszcze raz
+                fetch('/treningi', { headers: { 'Authorization': currentToken } })
+                .then(res => res.json())
+                .then(data => wyswietlTreningi(data));
+                document.getElementById('add-workout-form').reset();
+            });
+        });
+
+        // WYŚWIETLANIE TABELI
+        function wyswietlTreningi(data) {
+            const list = document.getElementById('treningi-list');
+            list.innerHTML = ''; 
+            if(data.length === 0) { list.innerHTML = '<tr><td colspan="4" class="text-center">Brak treningów.</td></tr>'; } 
+            else {
+                data.forEach(t => {
+                    list.innerHTML += `<tr>
+                        <td>${t.exerciseName}</td><td>${t.serie || t.weight || '-'}</td><td>${t.repetitions}</td>
+                        <td><button class="btn btn-sm btn-danger" onclick="usun(${t.id})">X</button></td>
+                    </tr>`;
+                });
+            }
+        }
+
+        // USUWANIE TRENINGU
+        function usun(id) {
+            fetch('/treningi/' + id, { method: 'DELETE', headers: { 'Authorization': currentToken } })
+            .then(() => {
+                fetch('/treningi', { headers: { 'Authorization': currentToken } })
+                .then(res => res.json())
+                .then(data => wyswietlTreningi(data));
+            });
+        }
+    </script>
+</body>
+</html>
