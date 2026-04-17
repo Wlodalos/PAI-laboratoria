@@ -118,7 +118,6 @@
             })
             })
             .then(() => {
-                // Po dodaniu odświeżamy tabelkę pobierając dane jeszcze raz
                 fetch('/treningi', { headers: { 'Authorization': currentToken } })
                 .then(res => res.json())
                 .then(data => wyswietlTreningi(data));
@@ -126,7 +125,6 @@
             });
         });
 
-        // WYŚWIETLANIE TABELI
         function wyswietlTreningi(data) {
             const list = document.getElementById('treningi-list');
             list.innerHTML = ''; 
@@ -141,7 +139,6 @@
             }
         }
 
-        // USUWANIE TRENINGU
         function usun(id) {
             fetch('/treningi/' + id, { method: 'DELETE', headers: { 'Authorization': currentToken } })
             .then(() => {

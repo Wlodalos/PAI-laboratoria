@@ -20,7 +20,6 @@ public class AuthController {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new RuntimeException("Użytkownik już istnieje!");
         }
-        // Szyfrujemy hasło przed zapisem do bazy!
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return "Zarejestrowano pomyślnie!";

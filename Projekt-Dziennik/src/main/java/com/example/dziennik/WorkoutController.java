@@ -18,17 +18,14 @@ public class WorkoutController {
 
     @GetMapping
     public List<Workout> pobierzMojeTreningi(Principal principal) {
-        // Zwraca tylko treningi aktualnie zalogowanego użytkownika
         return repository.findByAppUserUsername(principal.getName());
     }
 
     @PostMapping
     public Workout dodajTrening(@RequestBody Workout workout, Principal principal) {
-        // Znajdujemy w bazie użytkownika po jego loginie
         AppUser user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Błąd logowania"));
         
-        // Przypisujemy trening do tego użytkownika i zapisujemy
         workout.setAppUser(user);
         return repository.save(workout);
     }

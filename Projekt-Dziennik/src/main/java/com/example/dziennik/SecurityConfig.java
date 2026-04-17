@@ -16,18 +16,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Wyłączamy ochronę CSRF dla uproszczenia naszego API
+            .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index.html", "/api/auth/register").permitAll() // Te linki nie wymagają hasła
-                .anyRequest().authenticated() // Każdy inny link (np. /treningi) blokujemy kłódką
+                .requestMatchers("/", "/index.html", "/api/auth/register").permitAll() 
+                .anyRequest().authenticated() 
             )
-            .httpBasic(Customizer.withDefaults()); // Włączamy standardowe okienko logowania
+            .httpBasic(Customizer.withDefaults());
         
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Zaawansowany algorytm szyfrujący
+        return new BCryptPasswordEncoder();
     }
 }
