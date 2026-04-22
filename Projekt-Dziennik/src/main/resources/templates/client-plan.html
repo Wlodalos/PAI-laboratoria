@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Plan Podopiecznego</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 6px solid #2980b9; }
+        h2 { margin: 0; color: #2c3e50; }
+        
+        .btn-back { background-color: #27ae60; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; }
+        .btn-back:hover { background-color: #219d53; }
+        
+        .add-form { background: white; padding: 25px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid #2ecc71; }
+        .add-form input { padding: 10px; margin-right: 10px; border: 1px solid #ddd; border-radius: 4px; width: 180px; }
+        .add-form button { background-color: #2ecc71; color: white; padding: 10px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .add-form button:hover { background-color: #27ae60; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background-color: #2980b9; color: white; text-transform: uppercase; font-size: 14px; }
+        tr:hover { background-color: #f9f9f9; }
+        
+        .empty-state { text-align: center; padding: 40px; color: #7f8c8d; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <h2 style="color: #2980b9;">Tryb Trenera</h2>
+        <p style="margin: 5px 0 0 0; color: #7f8c8d;">Zarządzasz planem podopiecznego: <strong style="color: #2c3e50;" th:text="${client.username}"></strong></p>
+    </div>
+    
+    <a th:href="@{/workouts}" class="btn-back">« Wróć do listy klientów</a>
+</div>
+
+<div class="add-form">
+    <h3 style="margin-top: 0; color: #2e7d32;">Dodaj ćwiczenie dla tego klienta:</h3>
+    <form th:action="@{/trener/plan/{id}/add(id=${client.id})}" method="post">
+        <input type="text" name="exerciseName" placeholder="Nazwa ćwiczenia" required>
+        <input type="number" name="weight" placeholder="Ciężar (kg)" required>
+        <input type="number" name="repetitions" placeholder="Powtórzenia" required>
+        <button type="submit">Dodaj do jego planu</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Ćwiczenie</th>
+            <th>Ciężar</th>
+            <th>Powtórzenia</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="workout : ${workoutPage.content}">
+            <td th:text="${workout.id}">1</td>
+            <td th:text="${workout.exerciseName}" style="font-weight: bold;">Wyciskanie</td>
+            <td th:text="${workout.weight + ' kg'}">100 kg</td>
+            <td th:text="${workout.repetitions}">10</td>
+        </tr>
+        
+        <tr th:if="${#lists.isEmpty(workoutPage.content)}">
+            <td colspan="4" class="empty-state">Ten podopieczny nie ma jeszcze żadnych wpisów. Ułóż mu pierwszy trening!</td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

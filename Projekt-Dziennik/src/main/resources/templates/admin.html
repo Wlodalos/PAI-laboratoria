@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Administratora</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 40px; }
+        .admin-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 1000px; margin: 0 auto; border-top: 6px solid #8e44ad; }
+        h2 { color: #2c3e50; margin-bottom: 20px; }
+        
+        .header-links { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .back-link { color: #8e44ad; text-decoration: none; font-weight: bold; font-size: 16px; }
+        .back-link:hover { text-decoration: underline; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background-color: #8e44ad; color: white; text-transform: uppercase; font-size: 14px; }
+        tr:hover { background-color: #f9f9f9; }
+        
+        .role-badge { background-color: #e0e0e0; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 5px; }
+        
+        .action-form { display: inline-block; margin-right: 10px; }
+        select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .btn-change { background-color: #8e44ad; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-change:hover { background-color: #732d91; }
+        
+        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-delete:hover { background-color: #c0392b; }
+        
+        .btn-logout { background-color: #34495e; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <div class="header-links">
+        <a th:href="@{/my-workouts}" class="back-link">« Powrót do moich treningów</a>
+        
+        <form th:action="@{/logout}" method="post" style="margin: 0;">
+            <button type="submit" class="btn-logout">Wyloguj się</button>
+        </form>
+    </div>
+
+    <h2>Zarządzanie Użytkownikami</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nazwa Użytkownika</th>
+                <th>Obecne Role</th>
+                <th>Akcje (Zmień rolę / Usuń)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}">1</td>
+                <td th:text="${user.username}" style="font-weight: bold;">Login</td>
+                <td>
+                    <span th:each="role : ${user.roles}" class="role-badge" th:text="${role.name}">USER</span>
+                </td>
+                <td>
+                    <div th:if="${user.username != username}">
+                        <form th:action="@{/admin/change-role/{id}(id=${user.id})}" method="post" class="action-form">
+                            <select name="newRole">
+                                <option value="USER">USER</option>
+                                <option value="TRENER">TRENER</option>
+                                <option value="ADMIN">ADMIN</option>
+                            </select>
+                            <button type="submit" class="btn-change">Zmień</button>
+                        </form>
+
+                        <form th:action="@{/admin/delete-user/{id}(id=${user.id})}" method="post" class="action-form">
+                            <button type="submit" class="btn-delete" onclick="return confirm('Czy na pewno chcesz bezpowrotnie usunąć to konto?');">Usuń</button>
+                        </form>
+                    </div>
+                    <div th:if="${user.username == username}" style="color: #27ae60; font-weight: bold; font-size: 14px;">
+                        To jest Twoje konto
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

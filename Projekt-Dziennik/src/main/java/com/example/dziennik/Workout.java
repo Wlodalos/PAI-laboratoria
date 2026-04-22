@@ -42,6 +42,7 @@ public class Workout {
     private String updatedBy;
 
     public Workout() {}
+    
     public Workout(String exerciseName, int weight, int repetitions) {
         this.exerciseName = exerciseName;
         this.weight = weight;
@@ -49,9 +50,29 @@ public class Workout {
     }
 
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
     public String getExerciseName() { return exerciseName; }
+    public void setExerciseName(String exerciseName) { this.exerciseName = exerciseName; }
+
     public int getWeight() { return weight; }
+    public void setWeight(int weight) { this.weight = weight; }
+
     public int getRepetitions() { return repetitions; }
+    public void setRepetitions(int repetitions) { this.repetitions = repetitions; }
+
     public AppUser getAppUser() { return appUser; }
     public void setAppUser(AppUser appUser) { this.appUser = appUser; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+
+    public String getUpdatedBy() { return updatedBy; }
+    public void setUpdatedBy(String updatedBy) { this.updatedBy = updatedBy; }
 }

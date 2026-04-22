@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Moje Treningi - Dziennik</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        h2 { margin: 0; color: #2c3e50; }
+        
+        .nav-buttons { display: flex; gap: 10px; align-items: center; }
+        .btn-admin-back { background-color: #8e44ad; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; }
+        .btn-trener-back { background-color: #27ae60; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; }
+        .btn-logout { background-color: #e74c3c; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        
+        .add-form { background: white; padding: 25px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid #3498db; }
+        .add-form input { padding: 10px; margin-right: 10px; border: 1px solid #ddd; border-radius: 4px; width: 180px; }
+        .add-form button { background-color: #3498db; color: white; padding: 10px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background-color: #3498db; color: white; text-transform: uppercase; font-size: 13px; }
+        
+        .btn-edit { background-color: #f1c40f; color: black; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 5px; }
+        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2>Witaj, <span th:text="${username}">Użytkowniku</span>!</h2>
+    
+    <div class="nav-buttons">
+        <a th:if="${roles != null and (roles.contains('ROLE_ADMIN') or roles.contains('ADMIN'))}" 
+           th:href="@{/workouts}" 
+           class="btn-admin-back">
+           Panel Administratora
+        </a>
+        
+        <a th:if="${roles != null and (roles.contains('ROLE_TRENER') or roles.contains('TRENER'))}" 
+           th:href="@{/workouts}" 
+           class="btn-trener-back">
+           Panel Trenera
+        </a>
+
+        <form th:action="@{/logout}" method="post" style="margin: 0;">
+            <button type="submit" class="btn-logout">Wyloguj się</button>
+        </form>
+    </div>
+</div>
+
+<div class="add-form">
+    <h3>Dodaj nowy wpis treningowy:</h3>
+    <form th:action="@{/workouts}" method="post">
+        <input type="text" name="exerciseName" placeholder="Nazwa ćwiczenia" required>
+        <input type="number" name="weight" placeholder="Ciężar (kg)" required>
+        <input type="number" name="repetitions" placeholder="Powtórzenia" required>
+        <button type="submit">Dodaj do dziennika</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Ćwiczenie</th>
+            <th>Ciężar</th>
+            <th>Powtórzenia</th>
+            <th>Utworzono (RODO)</th>
+            <th>Zmodyfikowano (RODO)</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="workout : ${workoutPage.content}">
+            <td th:text="${workout.id}">1</td>
+            <td th:text="${workout.exerciseName}" style="font-weight: bold;">Przysiady</td>
+            <td th:text="${workout.weight + ' kg'}">60 kg</td>
+            <td th:text="${workout.repetitions}">12</td>
+            
+            <td th:text="${#temporals.format(workout.createdAt, 'dd-MM-yyyy HH:mm')}">-</td>
+            <td th:text="${#temporals.format(workout.updatedAt, 'dd-MM-yyyy HH:mm')}">-</td>
+            
+            <td>
+                <div style="display: flex;">
+                    <a th:href="@{/workouts/edit/{id}(id=${workout.id})}" class="btn-edit">Edytuj</a>
+                    
+                    <form th:action="@{/workouts/delete/{id}(id=${workout.id})}" method="post" onsubmit="return confirm('Usunąć ten wpis?');" style="margin:0;">
+                        <button type="submit" class="btn-delete">Usuń</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div style="margin-top: 20px; color: #7f8c8d;">
+    Strona <span th:text="${workoutPage.number + 1}"></span> z <span th:text="${workoutPage.totalPages}"></span>
+</div>
+
+</body>
+</html>

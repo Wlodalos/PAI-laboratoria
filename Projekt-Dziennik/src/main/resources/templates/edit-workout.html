@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edycja Treningu</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; background-color: #f4f4f9; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;}
+        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;}
+        .cancel-btn { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Edytuj ćwiczenie</h2>
+    
+    <form th:action="@{/workouts/edit/{id}(id=${workout.id})}" method="post">
+        <div class="form-group">
+            <label>Nazwa ćwiczenia:</label>
+            <input type="text" name="exerciseName" th:value="${workout.exerciseName}" required>
+        </div>
+        <div class="form-group">
+            <label>Ciężar (kg):</label>
+            <input type="number" name="weight" th:value="${workout.weight}" required min="0" max="1500">
+        </div>
+        <div class="form-group">
+            <label>Powtórzenia:</label>
+            <input type="number" name="repetitions" th:value="${workout.repetitions}" required min="1" max="10000">
+        </div>
+        
+        <button type="submit">Zapisz zmiany</button>
+    </form>
+    
+    <a th:href="@{/workouts}" class="cancel-btn">Anuluj i wróć</a>
+</div>
+
+</body>
+</html>

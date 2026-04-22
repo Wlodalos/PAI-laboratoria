@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Rejestracja - Dziennik Treningowy</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; background-color: #f4f4f9; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        .error-msg { color: red; font-size: 0.9em; display: none; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Zarejestruj się</h2>
+    <div th:if="${error}" style="color: red; margin-bottom: 10px;" th:text="${error}"></div>
+
+    <form th:action="@{/register}" method="post" id="registerForm">
+        <div class="form-group">
+            <label for="username">Nazwa użytkownika:</label>
+            <input type="text" id="username" name="username" required minlength="3">
+        </div>
+        <div class="form-group">
+            <label for="password">Hasło:</label>
+            <input type="password" id="password" name="password" required minlength="5">
+        </div>
+        <div class="form-group">
+            <label for="confirmPassword">Powtórz hasło:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+            <div id="passwordError" class="error-msg">Hasła nie są identyczne!</div>
+        </div>
+        <button type="submit" id="submitBtn">Zarejestruj konta</button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 15px;">
+        Masz już konto? <a th:href="@{/login}">Zaloguj się</a>
+    </p>
+</div>
+
+<script>
+    const form = document.getElementById('registerForm');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const errorMsg = document.getElementById('passwordError');
+
+    form.addEventListener('submit', function(event) {
+        if (password.value !== confirmPassword.value) {
+            event.preventDefault();
+            errorMsg.style.display = 'block';
+        } else {
+            errorMsg.style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>

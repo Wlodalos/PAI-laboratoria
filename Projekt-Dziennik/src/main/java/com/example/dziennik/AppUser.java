@@ -38,6 +38,10 @@ public class AppUser {
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL)
     private List<Workout> workouts;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "trainer_id")
+    private AppUser trainer;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -60,12 +64,19 @@ public class AppUser {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
+    
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    
     public List<Workout> getWorkouts() { return workouts; }
     public void setWorkouts(List<Workout> workouts) { this.workouts = workouts; }
+    
     public List<Role> getRoles() { return roles; }
     public void setRoles(List<Role> roles) { this.roles = roles; }
+
+    public AppUser getTrainer() { return trainer; }
+    public void setTrainer(AppUser trainer) { this.trainer = trainer; }
 }
